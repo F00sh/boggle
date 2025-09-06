@@ -51,11 +51,13 @@ export const totalLetters = TOTAL_WEIGHT
 export const probabilities: Record<Letter, number> = PROBABILITIES
 
 // Generiraj 4x4 ploču uz ponderiranu distribuciju i max 3 pojave po slovu
-export function generateBoard(seed?: number): Letter[] {
+// 4. Funkcija za generiranje NxN ploče (default 4x4)
+export function generateBoard(size = 4, seed?: number): Letter[] {
+  const cells = Math.max(1, Math.floor(size)) * Math.max(1, Math.floor(size))
   const rng = mulberry32(seed ?? Math.floor(Math.random() * 2 ** 31))
   const counts = new Map<Letter, number>()
   const board: Letter[] = []
-  while (board.length < 16) {
+  while (board.length < cells) {
     const pick = pickWeightedFromRecord(LETTER_WEIGHTS, rng)
     const used = counts.get(pick) ?? 0
     if (used < 3) {

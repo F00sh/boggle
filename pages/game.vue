@@ -8,7 +8,8 @@
       </div>
 
       <div class="bg-slate-800/70 rounded-xl p-4 sm:p-6 border border-slate-700">
-        <div class="flex items-center justify-between gap-2 mb-4">
+        <!-- Desktop (sm+) header: timer left, controls right -->
+        <div class="hidden sm:flex items-center justify-between gap-2 mb-4">
           <div class="flex items-center gap-3">
             <span class="text-slate-300">Preostalo vreme:</span>
             <span :class="['text-2xl font-extrabold tabular-nums', danger ? 'text-red-400' : 'text-white']">
@@ -23,6 +24,14 @@
             <button class="px-3 py-2 rounded-lg bg-brand hover:bg-brand-dark" @click="newGame">Nova tabla</button>
             <button class="px-3 py-2 rounded-lg bg-orange-600 hover:bg-orange-500" @click="showRules = true">Pravila</button>
           </div>
+        </div>
+
+        <!-- Mobile (xs) timer above board -->
+        <div class="sm:hidden flex items-center justify-center gap-3 mb-3">
+          <span class="text-slate-300">Preostalo vreme:</span>
+          <span :class="['text-2xl font-extrabold tabular-nums', danger ? 'text-red-400' : 'text-white']">
+            {{ mm }}:{{ ss }}
+          </span>
         </div>
 
         <div class="grid place-items-center py-2 relative">
@@ -48,6 +57,15 @@
               Pauzirano
             </div>
           </div>
+        </div>
+
+        <!-- Mobile (xs) controls below board -->
+        <div class="sm:hidden mt-4 flex items-center justify-center gap-2">
+          <button class="px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50" :disabled="preparing || waiting || finished" @click="togglePause">
+            {{ paused ? 'Nastavi' : 'Pauziraj' }}
+          </button>
+          <button class="px-3 py-2 rounded-lg bg-brand hover:bg-brand-dark" @click="newGame">Nova tabla</button>
+          <button class="px-3 py-2 rounded-lg bg-orange-600 hover:bg-orange-500" @click="showRules = true">Pravila</button>
         </div>
 
         <div v-if="finished" class="mt-4 text-center">

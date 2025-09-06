@@ -3,7 +3,7 @@ import { generateBoard, totalLetters, probabilities, getRandomLetter, getRandomL
 // Expose helpers for quick debugging in the browser console
 // Usage in DevTools:
 //   console.log('\nGenerirana ploča:')
-//   console.table(window.generateBoard(4))
+//   console.table(window.generateBoard(4)) // size = 4 (4x4)
 if (process.client) {
   // @ts-ignore
   window.generateBoard = generateBoard
