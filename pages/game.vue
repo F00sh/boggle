@@ -59,9 +59,10 @@
           </div>
         </div>
 
-        <!-- Always below board: Dodaj + Riječi -->
+        <!-- Always below board: Dodaj + Poništi + Riječi -->
         <div class="mt-4 flex items-center justify-center gap-2">
           <button class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50" :disabled="!canAddWord || validating" @click="addWord">{{ validating ? 'Provjera…' : 'Dodaj' }}</button>
+          <button class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 disabled:opacity-50" :disabled="!hasSelection" @click="clearSelection">Poništi</button>
           <button class="px-4 py-2 rounded-lg bg-slate-600 hover:bg-slate-500" @click="showWords = true">Riječi</button>
         </div>
 
@@ -200,6 +201,7 @@ const selectedPath = ref<number[]>([])
 const errorMsg = ref('')
 const danger = computed(() => remaining.value <= 20 && !finished.value)
 const validating = ref(false)
+const hasSelection = computed(() => selectedPath.value.length > 0)
 
 let tickHandle: number | null = null
 let dangerInterval: number | null = null
@@ -396,6 +398,11 @@ async function addWord() {
 function handleRestart() {
   showScore.value = false
   newGame()
+}
+
+function clearSelection() {
+  selectedPath.value = []
+  errorMsg.value = ''
 }
 </script>
 
