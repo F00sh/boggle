@@ -6,15 +6,21 @@
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt build",
-    "preview": "nuxt preview"
+    "preview": "nuxt preview",
+    "build:dict": "node scripts/gen-croatian-words.mjs",
+    "build:plurals": "node scripts/gen-plurals.mjs",
+    "dict:convert": "node scripts/convert-hunspell-to-json.mjs",
+    "build:inflections": "node scripts/gen-inflections.mjs",
+    "dict:build-all": "node scripts/build-croatian-words.mjs"
   },
   "dependencies": {
+    "dictionary-hr": "^2.0.0",
     "nuxt": "^3.12.0"
   },
   "devDependencies": {
+    "@nuxtjs/tailwindcss": "^6.12.1",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
-    "@nuxtjs/tailwindcss": "^6.12.1",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.4.5"
   }

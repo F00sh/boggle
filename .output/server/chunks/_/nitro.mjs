@@ -157,8 +157,6 @@ function stringifyQuery(query) {
 const PROTOCOL_STRICT_REGEX = /^[\s\w\0+.-]{2,}:([/\\]{1,2})/;
 const PROTOCOL_REGEX = /^[\s\w\0+.-]{2,}:([/\\]{2})?/;
 const PROTOCOL_RELATIVE_REGEX = /^([/\\]\s*){2,}[^/\\]/;
-const PROTOCOL_SCRIPT_RE = /^[\s\0]*(blob|data|javascript|vbscript):$/i;
-const TRAILING_SLASH_RE = /\/$|\/\?|\/#/;
 const JOIN_LEADING_SLASH_RE = /^\.?\//;
 function hasProtocol(inputString, opts = {}) {
   if (typeof opts === "boolean") {
@@ -169,52 +167,20 @@ function hasProtocol(inputString, opts = {}) {
   }
   return PROTOCOL_REGEX.test(inputString) || (opts.acceptRelative ? PROTOCOL_RELATIVE_REGEX.test(inputString) : false);
 }
-function isScriptProtocol(protocol) {
-  return !!protocol && PROTOCOL_SCRIPT_RE.test(protocol);
-}
 function hasTrailingSlash(input = "", respectQueryAndFragment) {
-  if (!respectQueryAndFragment) {
+  {
     return input.endsWith("/");
   }
-  return TRAILING_SLASH_RE.test(input);
 }
 function withoutTrailingSlash(input = "", respectQueryAndFragment) {
-  if (!respectQueryAndFragment) {
+  {
     return (hasTrailingSlash(input) ? input.slice(0, -1) : input) || "/";
   }
-  if (!hasTrailingSlash(input, true)) {
-    return input || "/";
-  }
-  let path = input;
-  let fragment = "";
-  const fragmentIndex = input.indexOf("#");
-  if (fragmentIndex !== -1) {
-    path = input.slice(0, fragmentIndex);
-    fragment = input.slice(fragmentIndex);
-  }
-  const [s0, ...s] = path.split("?");
-  const cleanPath = s0.endsWith("/") ? s0.slice(0, -1) : s0;
-  return (cleanPath || "/") + (s.length > 0 ? `?${s.join("?")}` : "") + fragment;
 }
 function withTrailingSlash(input = "", respectQueryAndFragment) {
-  if (!respectQueryAndFragment) {
+  {
     return input.endsWith("/") ? input : input + "/";
   }
-  if (hasTrailingSlash(input, true)) {
-    return input || "/";
-  }
-  let path = input;
-  let fragment = "";
-  const fragmentIndex = input.indexOf("#");
-  if (fragmentIndex !== -1) {
-    path = input.slice(0, fragmentIndex);
-    fragment = input.slice(fragmentIndex);
-    if (!path) {
-      return fragment;
-    }
-  }
-  const [s0, ...s] = path.split("?");
-  return s0 + "/" + (s.length > 0 ? `?${s.join("?")}` : "") + fragment;
 }
 function hasLeadingSlash(input = "") {
   return input.startsWith("/");
@@ -2498,8 +2464,7 @@ function createNodeFetch() {
 const fetch = globalThis.fetch ? (...args) => globalThis.fetch(...args) : createNodeFetch();
 const Headers$1 = globalThis.Headers || s$1;
 const AbortController = globalThis.AbortController || i;
-const ofetch = createFetch({ fetch, Headers: Headers$1, AbortController });
-const $fetch = ofetch;
+createFetch({ fetch, Headers: Headers$1, AbortController });
 
 function wrapToPromise(value) {
   if (!value || typeof value.then !== "function") {
@@ -3991,7 +3956,7 @@ function _expandFromEnv(value) {
 const _inlineRuntimeConfig = {
   "app": {
     "baseURL": "/",
-    "buildId": "d911de19-1272-4b13-8fb7-b3398571f558",
+    "buildId": "19426e37-2525-49af-8fdd-eda99b15b7a4",
     "buildAssetsDir": "/_nuxt/",
     "cdnURL": ""
   },
@@ -4063,124 +4028,6 @@ new Proxy(/* @__PURE__ */ Object.create(null), {
     return void 0;
   }
 });
-
-function createContext(opts = {}) {
-  let currentInstance;
-  let isSingleton = false;
-  const checkConflict = (instance) => {
-    if (currentInstance && currentInstance !== instance) {
-      throw new Error("Context conflict");
-    }
-  };
-  let als;
-  if (opts.asyncContext) {
-    const _AsyncLocalStorage = opts.AsyncLocalStorage || globalThis.AsyncLocalStorage;
-    if (_AsyncLocalStorage) {
-      als = new _AsyncLocalStorage();
-    } else {
-      console.warn("[unctx] `AsyncLocalStorage` is not provided.");
-    }
-  }
-  const _getCurrentInstance = () => {
-    if (als) {
-      const instance = als.getStore();
-      if (instance !== void 0) {
-        return instance;
-      }
-    }
-    return currentInstance;
-  };
-  return {
-    use: () => {
-      const _instance = _getCurrentInstance();
-      if (_instance === void 0) {
-        throw new Error("Context is not available");
-      }
-      return _instance;
-    },
-    tryUse: () => {
-      return _getCurrentInstance();
-    },
-    set: (instance, replace) => {
-      if (!replace) {
-        checkConflict(instance);
-      }
-      currentInstance = instance;
-      isSingleton = true;
-    },
-    unset: () => {
-      currentInstance = void 0;
-      isSingleton = false;
-    },
-    call: (instance, callback) => {
-      checkConflict(instance);
-      currentInstance = instance;
-      try {
-        return als ? als.run(instance, callback) : callback();
-      } finally {
-        if (!isSingleton) {
-          currentInstance = void 0;
-        }
-      }
-    },
-    async callAsync(instance, callback) {
-      currentInstance = instance;
-      const onRestore = () => {
-        currentInstance = instance;
-      };
-      const onLeave = () => currentInstance === instance ? onRestore : void 0;
-      asyncHandlers.add(onLeave);
-      try {
-        const r = als ? als.run(instance, callback) : callback();
-        if (!isSingleton) {
-          currentInstance = void 0;
-        }
-        return await r;
-      } finally {
-        asyncHandlers.delete(onLeave);
-      }
-    }
-  };
-}
-function createNamespace(defaultOpts = {}) {
-  const contexts = {};
-  return {
-    get(key, opts = {}) {
-      if (!contexts[key]) {
-        contexts[key] = createContext({ ...defaultOpts, ...opts });
-      }
-      return contexts[key];
-    }
-  };
-}
-const _globalThis = typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : typeof global !== "undefined" ? global : {};
-const globalKey = "__unctx__";
-const defaultNamespace = _globalThis[globalKey] || (_globalThis[globalKey] = createNamespace());
-const getContext = (key, opts = {}) => defaultNamespace.get(key, opts);
-const asyncHandlersKey = "__unctx_async_handlers__";
-const asyncHandlers = _globalThis[asyncHandlersKey] || (_globalThis[asyncHandlersKey] = /* @__PURE__ */ new Set());
-function executeAsync(function_) {
-  const restores = [];
-  for (const leaveHandler of asyncHandlers) {
-    const restore2 = leaveHandler();
-    if (restore2) {
-      restores.push(restore2);
-    }
-  }
-  const restore = () => {
-    for (const restore2 of restores) {
-      restore2();
-    }
-  };
-  let awaitable = function_();
-  if (awaitable && typeof awaitable === "object" && "catch" in awaitable) {
-    awaitable = awaitable.catch((error) => {
-      restore();
-      throw error;
-    });
-  }
-  return [awaitable, restore];
-}
 
 const config = useRuntimeConfig();
 const _routeRulesMatcher = toRouteMatcher(
@@ -4431,96 +4278,124 @@ const plugins = [
 ];
 
 const assets = {
+  "/croatian_words.json": {
+    "type": "application/json",
+    "etag": "\"c3482-DwDdIMWb8dEp6TDlLKZqwwZ0jqo\"",
+    "mtime": "2025-09-06T12:04:21.610Z",
+    "size": 799874,
+    "path": "../public/croatian_words.json"
+  },
+  "/croatian_words_extended.json": {
+    "type": "application/json",
+    "etag": "\"54-Dh4N2AWFb6Xpdbx2joZyQH9JU6s\"",
+    "mtime": "2025-09-06T12:00:20.052Z",
+    "size": 84,
+    "path": "../public/croatian_words_extended.json"
+  },
+  "/croatian_words_inflections.json": {
+    "type": "application/json",
+    "etag": "\"c33b9-x6FsaEeSPPhd4usQ8agUAvOgBYw\"",
+    "mtime": "2025-09-06T12:08:51.743Z",
+    "size": 799673,
+    "path": "../public/croatian_words_inflections.json"
+  },
   "/_nuxt/BbN5MGWu.js": {
     "type": "text/javascript; charset=utf-8",
     "etag": "\"d6d-v31VuW4UCM9ZrV9o56vCjIw56Lc\"",
-    "mtime": "2025-09-06T10:34:30.638Z",
+    "mtime": "2025-09-06T12:13:09.075Z",
     "size": 3437,
     "path": "../public/_nuxt/BbN5MGWu.js"
   },
-  "/_nuxt/BsnGEW1z.js": {
+  "/_nuxt/BiiNBTQR.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": "\"ed5-MwClf2NLn5g5lnpeqL8O+mSMMbs\"",
-    "mtime": "2025-09-06T10:34:30.638Z",
-    "size": 3797,
-    "path": "../public/_nuxt/BsnGEW1z.js"
+    "etag": "\"36fa-p8iajGFrxK4oEgrJKFiP+LXWn1U\"",
+    "mtime": "2025-09-06T12:13:09.076Z",
+    "size": 14074,
+    "path": "../public/_nuxt/BiiNBTQR.js"
   },
-  "/_nuxt/COrkcRMT.js": {
+  "/_nuxt/D1OT1tiw.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": "\"f00-0Vxdec76WitP17n+IB/yZHbxZRY\"",
-    "mtime": "2025-09-06T10:34:30.639Z",
-    "size": 3840,
-    "path": "../public/_nuxt/COrkcRMT.js"
+    "etag": "\"431-jfcwTCYxNM2kl5SHikIpzS3camY\"",
+    "mtime": "2025-09-06T12:13:09.076Z",
+    "size": 1073,
+    "path": "../public/_nuxt/D1OT1tiw.js"
+  },
+  "/_nuxt/DE-5LMyr.js": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": "\"ed5-G7YRU71mODC6ExQqumyoy+ZcN8w\"",
+    "mtime": "2025-09-06T12:13:09.075Z",
+    "size": 3797,
+    "path": "../public/_nuxt/DE-5LMyr.js"
+  },
+  "/_nuxt/DGlG0uce.js": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": "\"28d32-p0TM4EFYGJJ+M44knKf5tvCVBWE\"",
+    "mtime": "2025-09-06T12:13:09.075Z",
+    "size": 167218,
+    "path": "../public/_nuxt/DGlG0uce.js"
   },
   "/_nuxt/DlAUqK2U.js": {
     "type": "text/javascript; charset=utf-8",
     "etag": "\"5b-eFCz/UrraTh721pgAl0VxBNR1es\"",
-    "mtime": "2025-09-06T10:34:30.638Z",
+    "mtime": "2025-09-06T12:13:09.076Z",
     "size": 91,
     "path": "../public/_nuxt/DlAUqK2U.js"
   },
-  "/_nuxt/DPczl_Cb.js": {
+  "/_nuxt/Dxs7FzeS.js": {
     "type": "text/javascript; charset=utf-8",
-    "etag": "\"13e1-6E8S0WpiTwGUTE50Qbg7p4k/oxs\"",
-    "mtime": "2025-09-06T10:34:30.635Z",
-    "size": 5089,
-    "path": "../public/_nuxt/DPczl_Cb.js"
-  },
-  "/_nuxt/D_sTWXg7.js": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": "\"42c-NS1auobhFnpe4RBqdDesvyYuZQo\"",
-    "mtime": "2025-09-06T10:34:30.639Z",
-    "size": 1068,
-    "path": "../public/_nuxt/D_sTWXg7.js"
+    "etag": "\"13eb-4601zu8rqCC8eIqY3pVDeBgglwo\"",
+    "mtime": "2025-09-06T12:13:09.076Z",
+    "size": 5099,
+    "path": "../public/_nuxt/Dxs7FzeS.js"
   },
   "/_nuxt/error-404.DqZyKpgk.css": {
     "type": "text/css; charset=utf-8",
     "etag": "\"dce-saxwjItO1YVdOSJb93rly2zR334\"",
-    "mtime": "2025-09-06T10:34:30.638Z",
+    "mtime": "2025-09-06T12:13:09.074Z",
     "size": 3534,
     "path": "../public/_nuxt/error-404.DqZyKpgk.css"
   },
   "/_nuxt/error-500.CZqNkBuR.css": {
     "type": "text/css; charset=utf-8",
     "etag": "\"75c-Ri+jM1T7rkunCBcNyJ0rTLFEHks\"",
-    "mtime": "2025-09-06T10:34:30.638Z",
+    "mtime": "2025-09-06T12:13:09.075Z",
     "size": 1884,
     "path": "../public/_nuxt/error-500.CZqNkBuR.css"
   },
-  "/_nuxt/game.D4lQc0of.css": {
+  "/_nuxt/game._jcOe_FR.css": {
     "type": "text/css; charset=utf-8",
-    "etag": "\"42-nf3O+W2CiiFq2Z1IqdsInE9c3O4\"",
-    "mtime": "2025-09-06T10:34:30.638Z",
+    "etag": "\"42-2Sj/kQCwOuDyo1sD+CNHWNurvxM\"",
+    "mtime": "2025-09-06T12:13:09.075Z",
     "size": 66,
-    "path": "../public/_nuxt/game.D4lQc0of.css"
+    "path": "../public/_nuxt/game._jcOe_FR.css"
   },
   "/_nuxt/Hsbwpiff.js": {
     "type": "text/javascript; charset=utf-8",
     "etag": "\"f0-78hxw4AaCtYrpqjeZy2Gaj/e5VU\"",
-    "mtime": "2025-09-06T10:34:30.638Z",
+    "mtime": "2025-09-06T12:13:09.075Z",
     "size": 240,
     "path": "../public/_nuxt/Hsbwpiff.js"
   },
-  "/_nuxt/LFOK994O.js": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": "\"287ab-M/30uCDICls1pfAueXwn7QxAVFk\"",
-    "mtime": "2025-09-06T10:34:30.638Z",
-    "size": 165803,
-    "path": "../public/_nuxt/LFOK994O.js"
-  },
   "/_nuxt/builds/latest.json": {
     "type": "application/json",
-    "etag": "\"47-qdVpaUKUdsi7qXDLbfZRZvihxzY\"",
-    "mtime": "2025-09-06T10:34:32.474Z",
+    "etag": "\"47-Lc7hxL0BKTN3HXeB5J+goD2r/zA\"",
+    "mtime": "2025-09-06T12:13:13.652Z",
     "size": 71,
     "path": "../public/_nuxt/builds/latest.json"
   },
-  "/_nuxt/builds/meta/d911de19-1272-4b13-8fb7-b3398571f558.json": {
+  "/_nuxt/builds/meta/19426e37-2525-49af-8fdd-eda99b15b7a4.json": {
     "type": "application/json",
-    "etag": "\"8b-lLz2dgU8KMOhbKa++J6w1dvXkaQ\"",
-    "mtime": "2025-09-06T10:34:32.475Z",
+    "etag": "\"8b-9qT6K9Fr2TAgFugHbHqrQ8ZLHyU\"",
+    "mtime": "2025-09-06T12:13:13.652Z",
     "size": 139,
-    "path": "../public/_nuxt/builds/meta/d911de19-1272-4b13-8fb7-b3398571f558.json"
+    "path": "../public/_nuxt/builds/meta/19426e37-2525-49af-8fdd-eda99b15b7a4.json"
+  },
+  "/_nuxt/builds/meta/dev.json": {
+    "type": "application/json",
+    "etag": "\"6a-0Mi3RQcdCl3M7mcMp5qIABMxeuU\"",
+    "mtime": "2025-09-06T12:13:12.233Z",
+    "size": 106,
+    "path": "../public/_nuxt/builds/meta/dev.json"
   }
 };
 
@@ -4733,7 +4608,7 @@ const _sVnOs4 = eventHandler((event) => {
 
 const _SxA8c9 = defineEventHandler(() => {});
 
-const _lazy_D8mrBN = () => import('../routes/renderer.mjs').then(function (n) { return n.r; });
+const _lazy_D8mrBN = () => import('../routes/renderer.mjs');
 
 const handlers = [
   { route: '', handler: _sVnOs4, lazy: false, middleware: true, method: undefined },
@@ -5168,5 +5043,5 @@ function setupGracefulShutdown(listener, nitroApp) {
   });
 }
 
-export { $fetch as $, withTrailingSlash as A, withoutTrailingSlash as B, trapUnhandledNodeErrors as a, useNitroApp as b, getResponseStatus as c, destr as d, defineRenderHandler as e, getQuery as f, getResponseStatusText as g, createError$1 as h, getRouteRules as i, joinRelativeURL as j, hasProtocol as k, joinURL as l, isScriptProtocol as m, sanitizeStatusCode as n, getContext as o, createHooks as p, executeAsync as q, relative as r, setupGracefulShutdown as s, toNodeListener as t, useRuntimeConfig as u, toRouteMatcher as v, withQuery as w, createRouter$1 as x, defu as y, parseQuery as z };
+export { getResponseStatus as a, getQuery as b, createError$1 as c, defineRenderHandler as d, getRouteRules as e, joinURL as f, getResponseStatusText as g, hasProtocol as h, useNitroApp as i, joinRelativeURL as j, destr as k, trapUnhandledNodeErrors as l, relative as r, setupGracefulShutdown as s, toNodeListener as t, useRuntimeConfig as u };
 //# sourceMappingURL=nitro.mjs.map

@@ -1,8 +1,8 @@
 const interopDefault = r => r.default || r || []
 export default {
-  "node_modules/nuxt/dist/app/entry.js": () => import('./_nuxt/entry-styles.CpySls6W.mjs').then(interopDefault),
-  "pages/game.vue": () => import('./_nuxt/game-styles.DnwCjf7a.mjs').then(interopDefault),
-  "pages/game.vue?vue&type=style&index=0&scoped=85686f25&lang.css": () => import('./_nuxt/game-styles.DymSYa9u.mjs').then(interopDefault),
+  "node_modules/nuxt/dist/app/entry.js": () => import('./_nuxt/entry-styles.Y6j1Dct1.mjs').then(interopDefault),
+  "pages/game.vue": () => import('./_nuxt/game-styles.DUFkPRg1.mjs').then(interopDefault),
+  "pages/game.vue?vue&type=style&index=0&scoped=715edf18&lang.css": () => import('./_nuxt/game-styles.DPyanzXa.mjs').then(interopDefault),
   "node_modules/nuxt/dist/app/components/error-404.vue": () => import('./_nuxt/error-404-styles.DYPeZSru.mjs').then(interopDefault),
   "node_modules/nuxt/dist/app/components/error-500.vue": () => import('./_nuxt/error-500-styles.DH4SuYyS.mjs').then(interopDefault),
   "node_modules/nuxt/dist/app/components/error-404.vue?vue&type=style&index=0&scoped=06403dcb&lang.css": () => import('./_nuxt/error-404-styles.DFuUZ_1i.mjs').then(interopDefault),

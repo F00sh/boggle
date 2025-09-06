@@ -30,5 +30,7 @@ export { requestIdleCallback, cancelIdleCallback } from '#app/compat/idle-callba
 export { setInterval } from '#app/compat/interval';
 export { definePageMeta } from '../node_modules/nuxt/dist/pages/runtime/composables';
 export { defineLazyHydrationComponent } from '#app/composables/lazy-hydration';
+export { HR_DICTIONARY, validateWordOffline } from '../utils/dictionary-hr';
 export { LETTERS, LETTER_WEIGHTS, TOTAL_WEIGHT, PROBABILITIES, totalLetters, probabilities, generateBoard, getRandomLetter, getRandomLetterByProbabilities, Letter } from '../utils/letters';
+export { validateWordHrWiktionary, validateWord } from '../utils/validate';
 export { useNuxtDevTools } from '../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools';

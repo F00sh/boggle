@@ -10,7 +10,7 @@
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
           <NuxtLink class="px-5 py-3 rounded-lg bg-brand hover:bg-brand-dark transition-colors font-semibold" to="/game">
-            Započni
+            Single Player
           </NuxtLink>
         </div>
       </div>
@@ -21,4 +21,3 @@
 <script setup lang="ts">
 // Landing page only
 </script>
-
