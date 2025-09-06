@@ -1,40 +1,131 @@
-import { Server as Server$1 } from 'node:http';
-import { Server } from 'node:https';
-import { t as toNodeListener, k as destr, u as useRuntimeConfig, l as trapUnhandledNodeErrors, s as setupGracefulShutdown, i as useNitroApp } from '../_/nitro.mjs';
-
-const cert = process.env.NITRO_SSL_CERT;
-const key = process.env.NITRO_SSL_KEY;
-const nitroApp = useNitroApp();
-const server$1 = cert && key ? new Server({ key, cert }, toNodeListener(nitroApp.h3App)) : new Server$1(toNodeListener(nitroApp.h3App));
-const port = destr(process.env.NITRO_PORT || process.env.PORT) || 3e3;
-const host = process.env.NITRO_HOST || process.env.HOST;
-const path = process.env.NITRO_UNIX_SOCKET;
-const listener = server$1.listen(path ? { path } : { port, host }, (err) => {
-  if (err) {
-    console.error(err);
-    process.exit(1);
+const client_manifest = {
+  "_DlAUqK2U.js": {
+    "resourceType": "script",
+    "module": true,
+    "prefetch": true,
+    "preload": true,
+    "file": "DlAUqK2U.js",
+    "name": "_plugin-vue_export-helper"
+  },
+  "_Dxs7FzeS.js": {
+    "resourceType": "script",
+    "module": true,
+    "prefetch": true,
+    "preload": true,
+    "file": "Dxs7FzeS.js",
+    "name": "nuxt-link",
+    "imports": [
+      "node_modules/nuxt/dist/app/entry.js"
+    ]
+  },
+  "_Hsbwpiff.js": {
+    "resourceType": "script",
+    "module": true,
+    "prefetch": true,
+    "preload": true,
+    "file": "Hsbwpiff.js",
+    "name": "v3",
+    "imports": [
+      "node_modules/nuxt/dist/app/entry.js"
+    ]
+  },
+  "node_modules/nuxt/dist/app/components/error-404.vue": {
+    "resourceType": "script",
+    "module": true,
+    "prefetch": true,
+    "preload": true,
+    "file": "DE-5LMyr.js",
+    "name": "error-404",
+    "src": "node_modules/nuxt/dist/app/components/error-404.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_Dxs7FzeS.js",
+      "_DlAUqK2U.js",
+      "_Hsbwpiff.js",
+      "node_modules/nuxt/dist/app/entry.js"
+    ],
+    "css": []
+  },
+  "error-404.DqZyKpgk.css": {
+    "file": "error-404.DqZyKpgk.css",
+    "resourceType": "style",
+    "prefetch": true,
+    "preload": true
+  },
+  "node_modules/nuxt/dist/app/components/error-500.vue": {
+    "resourceType": "script",
+    "module": true,
+    "prefetch": true,
+    "preload": true,
+    "file": "BbN5MGWu.js",
+    "name": "error-500",
+    "src": "node_modules/nuxt/dist/app/components/error-500.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_DlAUqK2U.js",
+      "_Hsbwpiff.js",
+      "node_modules/nuxt/dist/app/entry.js"
+    ],
+    "css": []
+  },
+  "error-500.CZqNkBuR.css": {
+    "file": "error-500.CZqNkBuR.css",
+    "resourceType": "style",
+    "prefetch": true,
+    "preload": true
+  },
+  "node_modules/nuxt/dist/app/entry.js": {
+    "resourceType": "script",
+    "module": true,
+    "prefetch": true,
+    "preload": true,
+    "file": "DGdnowRk.js",
+    "name": "entry",
+    "src": "node_modules/nuxt/dist/app/entry.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "node_modules/nuxt/dist/app/components/error-404.vue",
+      "node_modules/nuxt/dist/app/components/error-500.vue"
+    ],
+    "_globalCSS": true
+  },
+  "pages/game.vue": {
+    "resourceType": "script",
+    "module": true,
+    "prefetch": true,
+    "preload": true,
+    "file": "9o4BAFrB.js",
+    "name": "game",
+    "src": "pages/game.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_Dxs7FzeS.js",
+      "node_modules/nuxt/dist/app/entry.js",
+      "_DlAUqK2U.js"
+    ],
+    "css": []
+  },
+  "game.dzISWER0.css": {
+    "file": "game.dzISWER0.css",
+    "resourceType": "style",
+    "prefetch": true,
+    "preload": true
+  },
+  "pages/index.vue": {
+    "resourceType": "script",
+    "module": true,
+    "prefetch": true,
+    "preload": true,
+    "file": "D1OT1tiw.js",
+    "name": "index",
+    "src": "pages/index.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_Dxs7FzeS.js",
+      "node_modules/nuxt/dist/app/entry.js"
+    ]
   }
-  const protocol = cert && key ? "https" : "http";
-  const addressInfo = listener.address();
-  if (typeof addressInfo === "string") {
-    console.log(`Listening on unix socket ${addressInfo}`);
-    return;
-  }
-  const baseURL = (useRuntimeConfig().app.baseURL || "").replace(/\/$/, "");
-  const url = `${protocol}://${addressInfo.family === "IPv6" ? `[${addressInfo.address}]` : addressInfo.address}:${addressInfo.port}${baseURL}`;
-  console.log(`Listening on ${url}`);
-});
-trapUnhandledNodeErrors();
-setupGracefulShutdown(listener, nitroApp);
-const nodeServer = {};
+};
 
-const server = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
-  __proto__: null
-}, Symbol.toStringTag, { value: 'Module' }));
-
-const client_manifest = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
-  __proto__: null
-}, Symbol.toStringTag, { value: 'Module' }));
-
-export { client_manifest as c, nodeServer as n, server as s };
+export { client_manifest as default };
 //# sourceMappingURL=client.manifest.mjs.map

@@ -21,7 +21,7 @@
             <button class="px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50" :disabled="preparing || waiting || finished" @click="togglePause">
               {{ paused ? 'Nastavi' : 'Pauziraj' }}
             </button>
-            <button class="px-3 py-2 rounded-lg bg-brand hover:bg-brand-dark" @click="newGame">Nova tabla</button>
+            <button class="px-3 py-2 rounded-lg bg-brand hover:bg-brand-dark" @click="requestNewGame">Nova tabla</button>
             <button class="px-3 py-2 rounded-lg bg-orange-600 hover:bg-orange-500" @click="showRules = true">Pravila</button>
           </div>
         </div>
@@ -67,11 +67,11 @@
         </div>
 
         <!-- Mobile-only: other controls below them -->
-        <div class="sm:hidden mt-3 flex items-center justify-center gap-2">
+        <div class="sm:hidden mt-6 flex items-center justify-center gap-2">
           <button class="px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50" :disabled="preparing || waiting || finished" @click="togglePause">
             {{ paused ? 'Nastavi' : 'Pauziraj' }}
           </button>
-          <button class="px-3 py-2 rounded-lg bg-brand hover:bg-brand-dark" @click="newGame">Nova tabla</button>
+          <button class="px-3 py-2 rounded-lg bg-brand hover:bg-brand-dark" @click="requestNewGame">Nova tabla</button>
           <button class="px-3 py-2 rounded-lg bg-orange-600 hover:bg-orange-500" @click="showRules = true">Pravila</button>
         </div>
         
@@ -403,6 +403,16 @@ function handleRestart() {
 function clearSelection() {
   selectedPath.value = []
   errorMsg.value = ''
+}
+
+function requestNewGame() {
+  // Traži potvrdu ako je igra u tijeku (nije završena i nije u stanju čekanja)
+  const inProgress = (!waiting.value || preparing.value || paused.value) && !finished.value && remaining.value > 0
+  if (inProgress) {
+    const ok = window.confirm('Prekinuti trenutnu igru i započeti novu?')
+    if (!ok) return
+  }
+  newGame()
 }
 </script>
 
